@@ -303,7 +303,6 @@ button,.item,.ex,.ctile{position:relative;overflow:hidden}
 @media (min-width:1800px){
   .desk{grid-template-columns:400px minmax(0,1fr)}
   .sheet{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .sheet > .blk:last-of-type:nth-of-type(3n+1){grid-column:1/-1}
 }
 @media (max-width:760px){
   .bar{padding-block:8px}
@@ -329,6 +328,37 @@ button,.item,.ex,.ctile{position:relative;overflow:hidden}
   .mini button{padding:9px 14px;font-size:14px;border-radius:9px}
   .ctiles:has(.char){grid-template-columns:minmax(0,1fr)}
 }
+
+/* Writing block v3: character switcher + big practice square sized to the screen; calmer scrollbars */
+.chars{display:block}
+.char[hidden]{display:none!important}
+.ctabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.ctabs button{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:6px 14px 5px;display:grid;justify-items:center;min-width:64px;line-height:1.15}
+.ctabs .zh{font-size:30px}
+.ctabs small{font-size:12px;color:var(--muted)}
+.ctabs button[aria-selected="true"]{border-color:var(--seal);background:var(--seal-soft);color:var(--seal)}
+.ctabs button[aria-selected="true"] small{color:var(--seal)}
+.cpos{margin-left:8px;font-size:12px;color:var(--muted);font-weight:500}
+.cnav{display:flex;gap:8px;margin-top:6px}
+.cnav button{border:1px solid var(--line);background:transparent;border-radius:8px;padding:6px 12px;font-size:13px}
+.cnav button[disabled]{opacity:.35;cursor:default}
+@media (min-width:761px){
+  .write .char{grid-template-columns:auto minmax(0,1fr);gap:32px;align-items:center;padding:22px 26px}
+  .write .pad{border-radius:12px;border:1px solid var(--line)}
+  .write .cinfo{font-size:15px;gap:8px}
+  .write .cinfo .c1{font-size:20px}
+  .write .cinfo .c1 b{font-family:var(--hanzi);font-size:48px;line-height:1.1;margin-right:8px}
+  .write .mini{gap:8px;margin-top:10px}
+  .write .mini button{padding:8px 16px;font-size:14px;border-radius:9px}
+}
+@media (max-width:760px){ .ctabs{justify-content:center} .cnav{justify-content:center} }
+html{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--ink) 18%,transparent) transparent}
+.list-body,.modes,.lv{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--ink) 16%,transparent) transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--ink) 18%,transparent);border-radius:10px;border:3px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background-color:color-mix(in srgb,var(--ink) 32%,transparent)}
+::-webkit-scrollbar-corner{background:transparent}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
@@ -531,7 +561,7 @@ let radShard = null;
 const charLoader = (c, ok, fail) => { (CH[c] ? Promise.resolve(null) : (radShard || (radShard = fetch('strokes/rad.json').then(r => r.json())))).then(rd => (rd && rd[c]) ? rd : loadShard(c)).then(d => d[c] ? ok(d[c]) : fail(new Error('no data'))).catch(fail); };
 let writers = [];
 // Writing pad size: big and centred on phones so learners can follow and trace; compact beside the info on wider screens
-function padSize(box){ if (!matchMedia('(max-width:760px)').matches) return 130; const w = (box && box.clientWidth) ? box.clientWidth - 32 : innerWidth - 116; return Math.round(Math.max(180, Math.min(w, 320))); }
+function padSize(box, compact){ if (!matchMedia('(max-width:760px)').matches){ if (compact) return 160; const bw = (box && box.clientWidth) || 600; return Math.round(Math.max(240, Math.min(bw * 0.5, innerHeight - 220, 560))); } const w = (box && box.clientWidth) ? box.clientWidth - 32 : innerWidth - 116; return Math.round(Math.max(180, Math.min(w, 320))); }
 function makeWriter(el, c, size){
   el.style.width = el.style.height = size + 'px';
   if (!window.HanziWriter) { el.innerHTML = `<div class="zh" style="font-size:${size*0.7}px;text-align:center;line-height:${size}px">${esc(c)}</div>`; return null; }
@@ -629,8 +659,13 @@ function renderSheet(){
       </div>
     </div>
 
-    <section class="blk"><h3>Cách viết &amp; bộ thủ</h3><div class="chars" id="chars"></div>
-      <p class="note">Nét màu đỏ trong ô là phần bộ thủ. “Luyện viết” để tự vẽ từng nét bằng chuột hoặc ngón tay.</p></section>
+    <section class="blk wide write"><h3>Cách viết &amp; bộ thủ</h3><div class="chars" id="chars"></div>
+      <p class="note">Nét màu đỏ trong ô là phần bộ thủ. “Luyện viết” để tự vẽ từng nét bằng chuột hoặc ngón tay. Từ nhiều chữ: bấm từng chữ ở hàng trên (hoặc phím ← →) để chuyển.</p></section>
+
+    <section class="blk"><h3>Ví dụ</h3>
+      <div><div style="margin-bottom:4px"><span class="src file">Từ file của bạn</span></div>${exHTML({zh:w[6],py:w[7],vi:w[8]}, 1, {word:w[2]})}</div>
+      <div id="gex"></div>
+    </section>
 
     <section class="blk"><h3>Cách đọc</h3><div class="pron">${syls.map((s, i) => {
       const tips = pronGuide(s);
@@ -640,11 +675,6 @@ function renderSheet(){
     <section class="blk"><h3>Cách nhớ</h3>
       <div class="tip"><span class="src auto">Tự động từ cấu tạo chữ</span><div style="margin-top:6px">${autoTip(w) || 'Chưa có dữ liệu cấu tạo cho từ này.'}</div></div>
       <div id="gtip"></div>
-    </section>
-
-    <section class="blk"><h3>Ví dụ</h3>
-      <div><div style="margin-bottom:4px"><span class="src file">Từ file của bạn</span></div>${exHTML({zh:w[6],py:w[7],vi:w[8]}, 1, {word:w[2]})}</div>
-      <div id="gex"></div>
     </section>`;
   renderChars(w, chars);
   renderGen(w);
@@ -660,23 +690,43 @@ function renderChars(w, chars){
   writers.forEach(x => { try { x && x.cancelQuiz && x.cancelQuiz(); } catch {} }); writers = [];
   const box = $('#chars');
   const uniq = [...new Set(chars)];
-  box.innerHTML = uniq.map((c, i) => {
+  CUR_CHARS = uniq;
+  const tabs = uniq.length > 1 ? `<div class="ctabs" role="tablist" aria-label="Chọn chữ để học viết">${uniq.map((c, i) => `<button role="tab" data-ctab="${i}" aria-selected="${i === 0}"><span class="zh">${esc(c)}</span><small>${esc((CH[c] || {}).py || '')}</small></button>`).join('')}</div>` : '';
+  box.innerHTML = tabs + uniq.map((c, i) => {
     const x = CH[c] || {d:[]};
     const comps = x.d.filter(d => d !== c);
-    return `<div class="char"><div class="pad" id="pad${i}" aria-label="Thứ tự nét chữ ${esc(c)}"></div><div class="cinfo">
-      <div class="c1"><b>${esc(c)}</b> ${esc(x.py || '')}${x.hv ? ` · <span style="text-transform:uppercase;letter-spacing:.05em">${esc(x.hv)}</span>` : ''}</div>
+    return `<div class="char" data-ci="${i}"${i ? ' hidden' : ''}><div class="pad" id="pad${i}" aria-label="Thứ tự nét chữ ${esc(c)}"></div><div class="cinfo">
+      <div class="c1"><b>${esc(c)}</b> ${esc(x.py || '')}${x.hv ? ` · <span style="text-transform:uppercase;letter-spacing:.05em">${esc(x.hv)}</span>` : ''}${uniq.length > 1 ? `<span class="cpos">${i + 1}/${uniq.length}</span>` : ''}</div>
       <div class="kv">Bộ thủ: <span><span class="zh">${esc(x.r || '?')}</span> ${esc(radName(x.r))}</span></div>
       <div class="kv">Số nét: <span>${x.s || '?'}</span></div>
       ${x.t ? `<div class="kv">Loại: <span>${esc(TYPE_VI[x.t] || x.t)}</span></div>` : ''}
       ${comps.length ? `<div class="kv">Thành phần: <span>${comps.map(compLabel).join(', ')}</span></div>` : ''}
       <div class="mini"><button data-anim="${i}">Xem nét viết</button><button data-quiz="${i}">Luyện viết</button><button data-say="${esc(c)}">Nghe</button></div>
+      ${uniq.length > 1 ? `<div class="cnav"><button data-cgo="${i - 1}" ${i ? '' : 'disabled'} aria-label="Chữ trước">‹ Chữ trước</button><button data-cgo="${i + 1}" ${i < uniq.length - 1 ? '' : 'disabled'} aria-label="Chữ sau">Chữ sau ›</button></div>` : ''}
     </div></div>`;
   }).join('');
-  const size = padSize(box);
-  uniq.forEach((c, i) => { const wr = makeWriter($('#pad'+i), c, size); writers[i] = wr; });
-  // animate the first character once on open
-  setTimeout(() => { try { writers[0] && writers[0].animateCharacter(); } catch {} }, 250);
+  showChar(0);
 }
+let CUR_CHARS = [];
+// show one character of the word in the big practice square; writers are created lazily so hidden ones get the right size
+function showChar(i){
+  const box = $('#chars'); if (!box || i < 0 || i >= CUR_CHARS.length) return;
+  writers.forEach(x => { try { x && x.cancelQuiz && x.cancelQuiz(); } catch {} });
+  box.querySelectorAll('.char').forEach(el => { el.hidden = +el.dataset.ci !== i; });
+  box.querySelectorAll('[data-ctab]').forEach(el => el.setAttribute('aria-selected', String(+el.dataset.ctab === i)));
+  box.dataset.cur = i;
+  const size = padSize(box);
+  if (!writers[i]) writers[i] = makeWriter($('#pad' + i), CUR_CHARS[i], size);
+  else resizeWriter(i, size);
+  setTimeout(() => { try { writers[i] && (writers[i].showCharacter(), writers[i].animateCharacter()); } catch {} }, 200);
+}
+function resizeWriter(i, size){ const el = $('#pad' + i); if (!el) return; el.style.width = el.style.height = size + 'px'; try { writers[i] && writers[i].updateDimensions({width:size, height:size}); } catch {} }
+let rzT; addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(() => { const box = $('#chars'); if (box && box.dataset.cur != null && writers[+box.dataset.cur]) resizeWriter(+box.dataset.cur, padSize(box)); }, 150); });
+addEventListener('keydown', e => {
+  if (e.target.closest && e.target.closest('input,textarea,select') || e.altKey || e.ctrlKey || e.metaKey) return;
+  const box = $('#chars'); if (!box || !box.offsetParent || CUR_CHARS.length < 2) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft'){ const cur = +box.dataset.cur || 0; const n = cur + (e.key === 'ArrowRight' ? 1 : -1); if (n >= 0 && n < CUR_CHARS.length){ e.preventDefault(); showChar(n); } }
+});
 
 // ---------- Claude-generated tips & examples ----------
 function renderGen(w){
@@ -750,6 +800,7 @@ async function pullGen(id){
 // ---------- events ----------
 document.addEventListener('click', e => {
   const say = e.target.closest('[data-say]'); if (say){ speak(say.dataset.say, !!say.dataset.slow); return; }
+  const ct = e.target.closest('[data-ctab],[data-cgo]'); if (ct){ showChar(+(ct.dataset.ctab ?? ct.dataset.cgo)); return; }
   const a = e.target.closest('[data-anim]'); if (a){ const wr = writers[+a.dataset.anim]; if (wr){ try { wr.cancelQuiz(); } catch {} wr.showCharacter(); wr.animateCharacter(); } return; }
   const q = e.target.closest('[data-quiz]'); if (q){ const wr = writers[+q.dataset.quiz]; if (wr){ wr.quiz({ showHintAfterMisses: 2, onComplete: () => flash('Viết xong! Tốt lắm.') }); } return; }
   if (e.target.closest('#gen')){ const w = byId(S.sel); if (w) generateFor(w); return; }
@@ -938,7 +989,7 @@ function renderRadical(el, r){
       ${r.ex.length ? `<div class="ctiles">${r.ex.map(([c, wid]) => { const x = CH[c] || {}; const w = WORDS.find(w => w[0] === wid); return `<button class="ctile" data-goword="${wid}"><b class="zh">${esc(c)}</b><span>${esc(x.py || '')}${x.hv ? ' · ' + esc(x.hv) : ''}</span><small>${w ? esc(w[2]) + ': ' + esc(w[5]) : ''}</small></button>`; }).join('')}</div><p class="note">Bấm vào chữ để mở trang từ vựng. Muốn xem hết, gõ bộ thủ vào ô tìm kiếm ở mục Từ vựng.</p>` : '<p class="note">Không có chữ nào trong danh sách HSK của bạn dùng bộ này làm bộ thủ chính.</p>'}
     </section>
     <p class="note"><span class="src file">Từ file 214 bộ thủ của bạn</span> tên và giải nghĩa. Pinyin, nét viết và danh sách chữ HSK được thêm tự động.</p>`;
-  const size = padSize($('#rpad0') && $('#rpad0').closest('.ctiles'));
+  const size = padSize($('#rpad0') && $('#rpad0').closest('.ctiles'), true);
   forms.forEach((f, i) => { writers[i] = makeWriter($('#rpad' + i), f, size); });
   setTimeout(() => { try { writers[0] && writers[0].animateCharacter(); } catch {} }, 250);
 }
