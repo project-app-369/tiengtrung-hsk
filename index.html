@@ -315,6 +315,20 @@ button,.item,.ex,.ctile{position:relative;overflow:hidden}
   main{padding-block:10px}
   .list-head{position:sticky;top:0;background:var(--sheet);z-index:1}
 }
+
+/* Writing section on phones: one large centred practice square (米字格 guides), info and buttons centred underneath */
+.pad::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.55;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M0 0L100 100M100 0L0 100' stroke='%23999' stroke-width='.4' stroke-dasharray='2 2' vector-effect='non-scaling-stroke' fill='none'/%3E%3C/svg%3E") center/100% 100% no-repeat}
+@media (max-width:760px){
+  .chars{grid-template-columns:minmax(0,1fr);gap:16px}
+  .char{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center;padding:16px 14px 18px;gap:14px}
+  .pad{border-radius:12px;border:1px solid var(--line)}
+  .cinfo{align-items:center;font-size:14.5px;gap:5px}
+  .cinfo .c1{font-size:18px}
+  .cinfo .c1 b{font-size:28px}
+  .mini{justify-content:center;gap:8px;margin-top:8px}
+  .mini button{padding:9px 14px;font-size:14px;border-radius:9px}
+  .ctiles:has(.char){grid-template-columns:minmax(0,1fr)}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
@@ -359,7 +373,7 @@ button,.item,.ex,.ctile{position:relative;overflow:hidden}
 </main>
 <footer>Dữ liệu từ vựng, liên từ, 214 bộ thủ và câu cửa miệng lấy từ các file của bạn. Bộ thủ, cấu tạo chữ và nét viết: Make Me a Hanzi / Hanzi Writer (Arphic PL). Âm Hán Việt: Unihan kèm bổ sung, nên tham khảo. Phần đánh dấu <span class="src gen">✦ Gợi ý</span> là nội dung do AI tạo, hãy đối chiếu khi cần.</footer>
 
-<script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.7.2/dist/hanzi-writer.min.js"></script>
+<script src="hanzi-writer.min.js"></script>
 <script>
 (() => {
 'use strict';
@@ -516,7 +530,10 @@ function loadShard(c){ const k = c.codePointAt(0) % 48; if (!shardCache[k]) shar
 let radShard = null;
 const charLoader = (c, ok, fail) => { (CH[c] ? Promise.resolve(null) : (radShard || (radShard = fetch('strokes/rad.json').then(r => r.json())))).then(rd => (rd && rd[c]) ? rd : loadShard(c)).then(d => d[c] ? ok(d[c]) : fail(new Error('no data'))).catch(fail); };
 let writers = [];
+// Writing pad size: big and centred on phones so learners can follow and trace; compact beside the info on wider screens
+function padSize(box){ if (!matchMedia('(max-width:760px)').matches) return 130; const w = (box && box.clientWidth) ? box.clientWidth - 32 : innerWidth - 116; return Math.round(Math.max(180, Math.min(w, 320))); }
 function makeWriter(el, c, size){
+  el.style.width = el.style.height = size + 'px';
   if (!window.HanziWriter) { el.innerHTML = `<div class="zh" style="font-size:${size*0.7}px;text-align:center;line-height:${size}px">${esc(c)}</div>`; return null; }
   const cs = getComputedStyle(document.documentElement);
   return HanziWriter.create(el, c, { width:size, height:size, padding:6, charDataLoader: charLoader, showOutline:true,
@@ -655,7 +672,7 @@ function renderChars(w, chars){
       <div class="mini"><button data-anim="${i}">Xem nét viết</button><button data-quiz="${i}">Luyện viết</button><button data-say="${esc(c)}">Nghe</button></div>
     </div></div>`;
   }).join('');
-  const size = matchMedia('(max-width:760px)').matches ? 100 : 120;
+  const size = padSize(box);
   uniq.forEach((c, i) => { const wr = makeWriter($('#pad'+i), c, size); writers[i] = wr; });
   // animate the first character once on open
   setTimeout(() => { try { writers[0] && writers[0].animateCharacter(); } catch {} }, 250);
@@ -921,7 +938,7 @@ function renderRadical(el, r){
       ${r.ex.length ? `<div class="ctiles">${r.ex.map(([c, wid]) => { const x = CH[c] || {}; const w = WORDS.find(w => w[0] === wid); return `<button class="ctile" data-goword="${wid}"><b class="zh">${esc(c)}</b><span>${esc(x.py || '')}${x.hv ? ' · ' + esc(x.hv) : ''}</span><small>${w ? esc(w[2]) + ': ' + esc(w[5]) : ''}</small></button>`; }).join('')}</div><p class="note">Bấm vào chữ để mở trang từ vựng. Muốn xem hết, gõ bộ thủ vào ô tìm kiếm ở mục Từ vựng.</p>` : '<p class="note">Không có chữ nào trong danh sách HSK của bạn dùng bộ này làm bộ thủ chính.</p>'}
     </section>
     <p class="note"><span class="src file">Từ file 214 bộ thủ của bạn</span> tên và giải nghĩa. Pinyin, nét viết và danh sách chữ HSK được thêm tự động.</p>`;
-  const size = matchMedia('(max-width:760px)').matches ? 100 : 120;
+  const size = padSize($('#rpad0') && $('#rpad0').closest('.ctiles'));
   forms.forEach((f, i) => { writers[i] = makeWriter($('#rpad' + i), f, size); });
   setTimeout(() => { try { writers[0] && writers[0].animateCharacter(); } catch {} }, 250);
 }
