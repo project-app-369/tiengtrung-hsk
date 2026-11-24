@@ -28,6 +28,8 @@
 <meta property="og:description" content="Pinyin, Hán Việt, bộ thủ, nét viết, phát âm và 3 ví dụ cho mỗi từ. Miễn phí, không cần đăng nhập.">
 <meta property="og:url" content="https://project-app-369.github.io/tiengtrung-hsk/">
 <meta property="og:image" content="https://project-app-369.github.io/tiengtrung-hsk/og-image.png">
+<meta property="og:image:secure_url" content="https://project-app-369.github.io/tiengtrung-hsk/og-image.png">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Sổ từ HSK 1–6: con dấu chữ 汉 màu son trên nền giấy">
@@ -35,6 +37,8 @@
 <meta name="twitter:title" content="Sổ từ HSK 1–6 · Học 5.002 từ vựng tiếng Trung">
 <meta name="twitter:description" content="Pinyin, Hán Việt, bộ thủ, nét viết, phát âm và 3 ví dụ cho mỗi từ.">
 <meta name="twitter:image" content="https://project-app-369.github.io/tiengtrung-hsk/og-image.png">
+<meta name="twitter:image:alt" content="Sổ từ HSK 1–6: con dấu chữ 汉 màu son trên nền giấy">
+<meta itemprop="image" content="https://project-app-369.github.io/tiengtrung-hsk/og-image.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Sổ từ HSK 1–6","url":"https://project-app-369.github.io/tiengtrung-hsk/","applicationCategory":"EducationalApplication","operatingSystem":"Any","inLanguage":"vi","offers":{"@type":"Offer","price":"0","priceCurrency":"VND"},"description":"Học trọn bộ 5.002 từ vựng HSK 1–6: pinyin, Hán Việt, nghĩa tiếng Việt, bộ thủ, nét viết động, phát âm và 3 ví dụ cho mỗi từ. Có Liên từ, 214 Bộ thủ, Câu cửa miệng, Lượng từ và ôn thẻ. Miễn phí, không cần đăng nhập."}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -224,6 +228,20 @@ footer{max-width:1280px;margin:0 auto;padding-block:8px 28px;padding-left:max(16
 .tip{background:var(--seal-soft)}
 .thm{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--paper);display:grid;place-items:center;padding:0;flex:none}
 .thm svg{width:19px;height:19px}
+.inst{height:38px;border-radius:19px;border:1px solid var(--inkbtn,#1d1b18);background:var(--inkbtn,#1d1b18);color:var(--onink,#f6f5f1);display:inline-flex;align-items:center;gap:6px;padding:0 14px;font:600 14px/1 inherit;font-family:inherit;cursor:pointer;flex:none;white-space:nowrap}
+.inst svg{width:17px;height:17px}
+.inst[hidden]{display:none!important}
+@media (max-width:480px){.inst span{display:none}.inst{width:38px;padding:0;justify-content:center}}
+.isheet{position:fixed;inset:0;z-index:100;display:grid;align-items:end;justify-items:center;background:rgba(0,0,0,.42)}
+.isheet[hidden]{display:none}
+.isheet .card{width:min(440px,100%);background:var(--sheet,#f6f5f1);color:var(--ink,#1d1b18);border-radius:18px 18px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px rgba(0,0,0,.25)}
+.isheet h3{margin:0 0 10px;font-size:18px}
+.isheet ol{margin:0 0 14px;padding-left:22px;line-height:1.6;text-align:left}
+.isheet li{display:list-item;text-align:left;padding:2px 0;border:0;grid-template-columns:none}
+.isheet .card{text-align:left}
+.isheet .row{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.isheet .row img{width:52px;height:52px;border-radius:12px}
+.isheet button{width:100%;height:44px;border-radius:12px;border:0;background:var(--seal,#b8322a);color:#fff;font:600 15px/1 inherit;font-family:inherit}
 button,.item,.ex,.ctile{position:relative;overflow:hidden}
 .rip{position:absolute;border-radius:50%;pointer-events:none;background:currentColor;opacity:.2;transform:scale(0);animation:rip .6s ease-out forwards}
 @keyframes rip{to{transform:scale(1);opacity:0}}
@@ -254,6 +272,7 @@ button,.item,.ex,.ctile{position:relative;overflow:hidden}
       <button data-mode="cau" data-i="句" aria-pressed="false">Câu cửa miệng</button>
       <button data-mode="review" data-i="卡" aria-pressed="false">Ôn thẻ</button>
     </div>
+    <button class="inst" id="inst" hidden aria-label="Cài ứng dụng"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span>Cài app</span></button>
     <button class="thm" id="thm" aria-label="Đổi sáng / tối"></button>
   </div>
   <div class="filters">
@@ -992,6 +1011,41 @@ boot();
 })();
 </script>
 
+<div class="isheet" id="isheet" hidden role="dialog" aria-modal="true" aria-labelledby="isheet-t"><div class="card">
+  <div class="row"><img src="icons/icon-192.png" alt=""><div><h3 id="isheet-t">Cài Sổ từ HSK</h3><small>Mở như ứng dụng, dùng được khi mất mạng</small></div></div>
+  <ol id="isheet-steps"></ol>
+  <button type="button" id="isheet-x">Đã hiểu</button>
+</div></div>
+<script>
+(()=>{
+  const btn=document.getElementById('inst'),sh=document.getElementById('isheet'),steps=document.getElementById('isheet-steps');
+  const ua=navigator.userAgent;
+  const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+  const isIOS=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const inApp=/FBAN|FBAV|Instagram|Zalo|Line\/|TikTok/i.test(ua);
+  let deferred=null;
+  if(standalone) return;
+  const SHARE='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px"><path d="M12 3v13M7 8l5-5 5 5M5 12v8h14v-8"/></svg>';
+  function guide(){
+    if(inApp) steps.innerHTML='<li>Bấm nút <b>⋯</b> ở góc màn hình.</li><li>Chọn <b>Mở bằng trình duyệt</b> (Safari hoặc Chrome).</li><li>Bấm lại nút <b>Cài app</b> trên trang.</li>';
+    else if(isIOS) steps.innerHTML='<li>Bấm nút <b>Chia sẻ</b> '+SHARE+' trên thanh Safari.</li><li>Chọn <b>Thêm vào MH chính</b> (Add to Home Screen).</li><li>Bấm <b>Thêm</b>.</li>';
+    else steps.innerHTML='<li>Mở menu <b>⋮</b> của trình duyệt.</li><li>Chọn <b>Cài đặt ứng dụng</b> hoặc <b>Thêm vào màn hình chính</b>.</li>';
+    sh.hidden=false;
+  }
+  addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;btn.hidden=false;});
+  addEventListener('appinstalled',()=>{deferred=null;btn.hidden=true;sh.hidden=true;});
+  if(isIOS||inApp) btn.hidden=false;
+  btn.addEventListener('click',async()=>{
+    if(deferred){deferred.prompt();const r=await deferred.userChoice.catch(()=>null);deferred=null;if(r&&r.outcome==='accepted')btn.hidden=true;return;}
+    guide();
+  });
+  document.getElementById('isheet-x').onclick=()=>{sh.hidden=true};
+  sh.addEventListener('click',e=>{if(e.target===sh)sh.hidden=true});
+  addEventListener('keydown',e=>{if(e.key==='Escape')sh.hidden=true});
+  // Android Chrome sometimes fires no prompt (already dismissed): still offer the manual guide after a while
+  setTimeout(()=>{if(!deferred&&btn.hidden&&/Android/i.test(ua))btn.hidden=false;},4000);
+})();
+</script>
 <script>if('serviceWorker' in navigator && location.protocol==='https:'){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}</script>
 </body>
 </html>
