@@ -1,0 +1,22 @@
+{
+  "name": "Sổ từ HSK 1–6",
+  "short_name": "Sổ từ HSK",
+  "description": "Học trọn bộ 5.002 từ vựng HSK 1–6: pinyin, Hán Việt, bộ thủ, nét viết, phát âm và 3 ví dụ cho mỗi từ.",
+  "lang": "vi",
+  "dir": "ltr",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eceae4",
+  "theme_color": "#eceae4",
+  "categories": ["education", "books"],
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable"},
+    {"src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+    {"src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}
+  ]
+}
