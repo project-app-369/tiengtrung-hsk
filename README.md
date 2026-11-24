@@ -12,3 +12,8 @@ Trang: https://project-app-369.github.io/tiengtrung-hsk/
 - `manifest.webmanifest`, `sw.js`, `icons/`, `og-image.png`: cài đặt PWA, chạy offline, biểu tượng và ảnh chia sẻ
 
 Nguồn dữ liệu chữ: Make Me a Hanzi, hanzi-writer-data, Unihan.
+
+## Font
+Font được nhúng sẵn trong `fonts/`, hiển thị giống nhau trên mọi thiết bị:
+- Chữ Hán: AR PL UKai (kiểu chữ Khải/KaiTi, Arphic Public License), rút gọn còn các chữ dùng trong sổ; vài bộ kiện hiếm lấy từ LXGW WenKai (OFL).
+- Tiếng Việt và pinyin: Be Vietnam Pro (OFL), bổ sung dấu thanh pinyin ǎ ǐ ǒ ǔ ǖ ǘ ǚ ǜ.
