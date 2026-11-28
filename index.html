@@ -643,7 +643,7 @@ let radShard = null;
 const charLoader = (c, ok, fail) => { (CH[c] ? Promise.resolve(null) : (radShard || (radShard = fetch('strokes/rad.json').then(r => r.json())))).then(rd => (rd && rd[c]) ? rd : loadShard(c)).then(d => d[c] ? ok(d[c]) : fail(new Error('no data'))).catch(fail); };
 let writers = [];
 // Writing pad size: big and centred on phones so learners can follow and trace; compact beside the info on wider screens
-function padSize(box, compact){ if (!matchMedia('(max-width:760px)').matches){ if (compact) return 160; const bw = (box && box.clientWidth) || 600; return Math.round(Math.max(240, Math.min(bw * 0.5, innerHeight - 220, 560))); } const w = (box && box.clientWidth) ? box.clientWidth - 32 : innerWidth - 116; return Math.round(Math.max(180, Math.min(w, 320))); }
+function padSize(box, compact){ if (!matchMedia('(max-width:760px)').matches){ if (compact) return 160; const bw = (box && box.clientWidth) || 600; return Math.round(0.8 * Math.max(240, Math.min(bw * 0.5, innerHeight - 220, 560))); } const w = (box && box.clientWidth) ? box.clientWidth - 32 : innerWidth - 116; return Math.round(Math.max(180, Math.min(w, 320))); }
 function makeWriter(el, c, size){
   el.style.width = el.style.height = size + 'px';
   if (!window.HanziWriter) { el.innerHTML = `<div class="zh" style="font-size:${size*0.7}px;text-align:center;line-height:${size}px">${esc(c)}</div>`; return null; }
