@@ -359,6 +359,90 @@ html{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--ink) 18%,trans
 ::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--ink) 18%,transparent);border-radius:10px;border:3px solid transparent;background-clip:padding-box}
 ::-webkit-scrollbar-thumb:hover{background-color:color-mix(in srgb,var(--ink) 32%,transparent)}
 ::-webkit-scrollbar-corner{background:transparent}
+
+/* ===== v8: chooser (segmented → popup), flashcard swipe, swipe-back, redesigned top menu ===== */
+.cho{min-width:0;position:relative}
+.cho .seg{display:inline-flex;gap:4px;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--paper);white-space:nowrap;max-width:none}
+.cho .seg button{border:0;background:transparent;padding:5px 12px;border-radius:999px;font-size:13px;font-weight:500;color:var(--muted);transition:background .18s,color .18s}
+.cho .seg button:hover{color:var(--ink)}
+.cho .seg button[aria-pressed="true"]{background:var(--inkbtn,var(--ink));color:var(--onink,var(--sheet))}
+.cho .cho-btn{display:none;align-items:center;gap:6px;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 12px 6px 14px;font-size:13px;white-space:nowrap;max-width:100%}
+.cho .cho-btn .cl{color:var(--muted)}
+.cho .cho-btn b{font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.cho.folded .seg{display:none}
+.cho.folded .cho-btn{display:inline-flex}
+.lv button{border:0}
+.pop{position:fixed;inset:0;z-index:200;pointer-events:none}
+.pop .pop-list{pointer-events:auto;background:var(--sheet);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.22);padding:6px;display:grid;gap:2px;max-height:60vh;overflow:auto;animation:popin .16s ease-out}
+.pop .pop-list button{display:flex;justify-content:space-between;align-items:center;gap:16px;border:0;background:transparent;text-align:left;padding:9px 12px;border-radius:8px;font-size:14px}
+.pop .pop-list button:hover,.pop .pop-list button:focus-visible{background:var(--paper)}
+.pop .pop-list button svg{opacity:0;color:var(--seal)}
+.pop .pop-list button[aria-selected="true"]{font-weight:600}
+.pop .pop-list button[aria-selected="true"] svg{opacity:1}
+.pop.sheetpop{pointer-events:auto;display:flex;flex-direction:column;justify-content:flex-end}
+.pop.sheetpop .pop-bd{position:absolute;inset:0;background:rgba(0,0,0,.4);animation:fadein .2s}
+.pop.sheetpop .pop-h{position:relative;background:var(--sheet);border-radius:18px 18px 0 0;padding:14px 20px 4px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;animation:sheetup .24s cubic-bezier(.2,.8,.2,1)}
+.pop.sheetpop .pop-h::before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 12px;position:relative;left:0}
+.pop.sheetpop .pop-h{text-align:left}
+.pop.sheetpop .pop-list{position:relative;border:0;border-radius:0;box-shadow:none;padding:4px 10px calc(14px + env(safe-area-inset-bottom,0px));max-height:70vh;animation:sheetup .24s cubic-bezier(.2,.8,.2,1)}
+.pop.sheetpop .pop-list button{padding:14px 14px;font-size:16px}
+@keyframes popin{from{opacity:0;transform:translateY(-4px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes sheetup{from{transform:translateY(100%)}to{transform:none}}
+@keyframes fadein{from{opacity:0}}
+.opts{display:grid;gap:10px;justify-items:center}
+.optrow{display:flex;align-items:center;gap:10px;max-width:100%;min-width:0}
+.optrow .cho{min-width:0;flex:1 1 auto}
+.optlab{font-size:13px;color:var(--muted);white-space:nowrap}
+
+/* flashcard */
+#cardwrap{perspective:1200px}
+#review .card{position:relative;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:pan-y;will-change:transform;transform-origin:50% 90%}
+#review .card.enter{animation:cardin .32s cubic-bezier(.2,.8,.2,1)}
+#review .card.turning{transition:transform .16s ease-in;transform:rotateY(90deg)}
+#review .card.unturn{animation:unturn .2s ease-out}
+#review .card.back{background:color-mix(in srgb,var(--sheet) 94%,var(--seal))}
+@keyframes cardin{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes unturn{from{transform:rotateY(-90deg)}to{transform:none}}
+.swl{position:absolute;top:18px;padding:5px 12px;border-radius:8px;border:2px solid;font-weight:700;font-size:15px;letter-spacing:.04em;opacity:0;pointer-events:none;text-transform:uppercase}
+.swl.ok{left:18px;color:var(--jade-ok,#2f8a57);transform:rotate(-10deg)}
+.swl.no{right:18px;color:var(--seal);transform:rotate(10deg)}
+.fliphint{margin-top:6px}
+
+/* top menu: ink pill slides to the active section (desktop/tablet) */
+@media (min-width:761px){
+  .modes{position:relative;background:transparent;border:0;padding:0;gap:2px}
+  .modes button{position:relative;z-index:1;border-radius:999px;padding:8px 14px;color:var(--muted);font-weight:500;transition:color .2s}
+  .modes button:hover{color:var(--ink)}
+  .modes button[aria-pressed="true"]{background:transparent!important;box-shadow:none!important;color:var(--onink,var(--sheet))!important}
+  .modes .mode-ind{position:absolute;left:0;top:0;border-radius:999px;background:var(--inkbtn,var(--ink));z-index:0;transition:transform .32s cubic-bezier(.3,.9,.3,1.05),width .32s cubic-bezier(.3,.9,.3,1.05)}
+  .modes:not(.ready) .mode-ind{transition:none}
+  .modes .sh{display:none}
+}
+@media (max-width:760px){
+  .modes .mode-ind{display:none}
+  .modes .lg{display:none}
+  .modes{justify-content:space-around}
+  .modes button{flex:1 1 0;min-width:0;padding:4px 2px;font-size:11px;gap:3px;color:var(--muted)}
+  .modes .mi{display:grid;place-items:center;width:48px;height:28px;border-radius:999px;font-size:19px;transition:background .2s,color .2s}
+  .modes button[aria-pressed="true"]{color:var(--ink);font-weight:600}
+  .modes button[aria-pressed="true"] .mi{background:var(--seal-soft);color:var(--seal)}
+  .filters{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"q q" "lv st"}
+  .filters .search{grid-area:q}
+  .filters #levels{grid-area:lv;grid-column:auto;margin:0;padding:0;overflow:visible}
+  .filters #st{grid-area:st}
+  .filters .cho{width:100%}
+  .filters .cho .cho-btn{width:100%;justify-content:flex-start}
+  .filters .cho .cho-btn svg{margin-left:auto;flex:none}
+  .filters #st .cl{display:none}
+}
+.optrow .cho-btn .cl{display:none}
+@media (max-width:760px){
+  #review .stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:12px}
+  #review .stat{padding:8px 8px}
+  #review .stat b{font-size:18px}
+  #review .stat span{font-size:11px;line-height:1.25;display:block}
+  #review .card{min-height:340px}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
@@ -372,18 +456,16 @@ html{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--ink) 18%,trans
       <button data-mode="lien" data-i="连" aria-pressed="false">Liên từ</button>
       <button data-mode="bothu" data-i="部" aria-pressed="false">Bộ thủ</button>
       <button data-mode="luong" data-i="量" aria-pressed="false">Lượng từ</button>
-      <button data-mode="cau" data-i="句" aria-pressed="false">Câu cửa miệng</button>
+      <button data-mode="cau" data-i="句" aria-pressed="false"><span class="lg">Câu cửa miệng</span><span class="sh">Câu nói</span></button>
       <button data-mode="review" data-i="卡" aria-pressed="false">Ôn thẻ</button>
     </div>
     <button class="inst" id="inst" hidden aria-label="Cài ứng dụng"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span>Cài app</span></button>
     <button class="thm" id="thm" aria-label="Đổi sáng / tối"></button>
   </div>
   <div class="filters">
-    <div class="lv" id="levels" role="group" aria-label="Cấp HSK"></div>
+    <div class="cho lv" id="levels" role="group" aria-label="Cấp HSK"></div>
     <div class="search"><input id="q" type="search" placeholder="Tìm chữ Hán, pinyin (không dấu cũng được), Hán Việt hoặc nghĩa…" autocomplete="off"></div>
-    <select id="st" aria-label="Trạng thái">
-      <option value="all">Mọi trạng thái</option><option value="new">Chưa học</option><option value="learning">Đang học</option><option value="known">Đã thuộc</option>
-    </select>
+    <div class="cho" id="st" role="group" aria-label="Trạng thái"></div>
   </div>
 </header>
 
@@ -527,7 +609,7 @@ function compLabel(c){
 function autoTip(w){
   const chars = [...w[2]].filter(isHan);
   const parts = [];
-  if (w[4]) parts.push(`Hán Việt: <b>${esc(w[4].toUpperCase())}</b>, gợi tới nghĩa “${esc(w[5])}”.`);
+  if (w[4]) parts.push(`Âm Hán Việt của từ là <b>${esc(w[4].toUpperCase())}</b>, gợi tới nghĩa “${esc(w[5])}”.`);
   for (const c of chars.slice(0,4)){
     const x = CH[c]; if (!x) continue;
     if (x.t === 'pictophonetic' && x.se && x.ph) parts.push(`<span class="zh">${esc(c)}</span> là chữ hình thanh: ${compLabel(x.se)} gợi nghĩa, ${compLabel(x.ph)} gợi âm${CH[x.ph]?.py ? ' (' + esc(CH[x.ph].py) + ')' : ''}.`);
@@ -812,20 +894,22 @@ document.addEventListener('click', e => {
 });
 let qT = null;
 $('#q').addEventListener('input', e => { clearTimeout(qT); qT = setTimeout(() => { if (SEC[S.mode]){ SEC[S.mode].q = e.target.value; renderSecList(); const f = secFiltered(S.mode)[0]; if (f && !matchMedia('(max-width:760px)').matches) selectSec(f.id); return; } S.q = e.target.value; applyFilter(); if (S.mode === 'learn' && filtered[0] && !matchMedia('(max-width:760px)').matches) select(filtered[0][0]); }, 160); });
-$('#st').addEventListener('change', e => { S.st = e.target.value; applyFilter(); });
+chooser($('#st'), { label:'Trạng thái', options:[['all','Mọi trạng thái'],['new','Chưa học'],['learning','Đang học'],['known','Đã thuộc']], value:() => S.st || 'all', onChange:v => { S.st = v; applyFilter(); } });
 function renderLevels(){
-  $('#levels').innerHTML = ['Tất cả',1,2,3,4,5,6].map((l, i) => `<button data-lv="${i}" aria-pressed="${S.level===i}">${i ? 'HSK ' + l : l}</button>`).join('');
+  chooser($('#levels'), { label:'Cấp', options:['Tất cả',1,2,3,4,5,6].map((l, i) => [i, i ? 'HSK ' + l : l]), value:() => S.level, onChange:v => levelPick(v) });
 }
-$('#levels').addEventListener('click', e => { const b = e.target.closest('[data-lv]'); if (!b) return; S.level = +b.dataset.lv; store.set('hsk.level', S.level); renderLevels(); applyFilter(); if (S.mode === 'review') renderReview(); else if (filtered[0] && !matchMedia('(max-width:760px)').matches) select(filtered[0][0]); });
+function levelPick(v){ const b = {dataset:{lv:v}}; S.level = +b.dataset.lv; store.set('hsk.level', S.level); renderLevels(); applyFilter(); if (S.mode === 'review') renderReview(); else if (filtered[0] && !matchMedia('(max-width:760px)').matches) select(filtered[0][0]); }
 const PH = { learn:'Tìm chữ Hán, pinyin (không dấu cũng được), Hán Việt hoặc nghĩa…', lien:'Tìm liên từ theo chữ Hán, pinyin hoặc nghĩa…', bothu:'Tìm bộ thủ theo tên (thủy, mộc…), số thứ tự hoặc gõ một chữ Hán…', cau:'Tìm câu theo chữ Hán, pinyin hoặc nghĩa…', luong:'Tìm lượng từ theo chữ Hán, pinyin hoặc nghĩa…' };
 function setMode(m){
   S.mode = m; store.set('hsk.mode', m);
   document.querySelectorAll('.modes [data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m));
+  requestAnimationFrame(placeModeInd); closePop();
   const isSec = !!SEC[m];
   $('#learn').hidden = m !== 'learn'; $('#review').hidden = m !== 'review'; $('#sec').hidden = !isSec;
   document.querySelector('.search').hidden = m === 'review'; $('#st').hidden = m !== 'learn'; $('#levels').hidden = isSec;
   $('#q').placeholder = PH[m] || ''; $('#q').value = isSec ? SEC[m].q : (m === 'learn' ? S.q : '');
   if (m === 'review') renderReview();
+  requestAnimationFrame(fitAll);
   if (isSec){ $('#sec').classList.remove('detail'); $('#shint').textContent = m === 'bothu' ? 'số chữ HSK' : ''; SEC[m].sel = SEC[m].sel || store.get('hsk.sel.' + m, null); renderSecList(); renderSecSheet(); }
 }
 document.querySelector('.modes').addEventListener('click', e => { const b = e.target.closest('[data-mode]'); if (b) setMode(b.dataset.mode); });
@@ -1020,14 +1104,13 @@ function renderReview(){
       <div class="stat"><b>${known}</b><span>đã thuộc</span></div>
       <div class="stat"><b>${pool.length - known - learning}</b><span>chưa học</span></div>
     </div>
-    <div class="opts"><label>Mặt trước: <select id="dir"><option value="zh">Chữ Hán</option><option value="vi">Nghĩa tiếng Việt</option><option value="audio">Chỉ nghe</option></select></label>
-      <label>Từ mới mỗi ngày: <select id="npd">${[10,20,30,50,100].map(n => `<option ${n===R.newPerDay?'selected':''}>${n}</option>`).join('')}</select></label></div>
+    <div class="opts"><div class="optrow"><span class="optlab">Mặt trước</span><div class="cho" id="dir" role="group" aria-label="Mặt trước"></div></div>
+      <div class="optrow"><span class="optlab">Từ mới mỗi ngày</span><div class="cho" id="npd" role="group" aria-label="Từ mới mỗi ngày"></div></div></div>
     <div id="cardwrap"></div>
     <div class="levels">${lv}</div>
     <p class="note">Thẻ “Chưa nhớ” sẽ quay lại ngay trong buổi này; “Hơi khó” ôn lại sau 1 ngày; “Nhớ rồi” giãn dần 1 → 3 → 7 → 16 → 35 ngày. Từ ôn tới mức 16 ngày được tính là đã thuộc.</p>`;
-  $('#dir').value = R.dir;
-  $('#dir').onchange = e => { R.dir = e.target.value; store.set('hsk.dir', R.dir); nextCard(); };
-  $('#npd').onchange = e => { R.newPerDay = +e.target.value; store.set('hsk.newPerDay', R.newPerDay); renderReview(); };
+  chooser($('#dir'), { label:'Mặt trước', options:[['zh','Chữ Hán'],['vi','Nghĩa tiếng Việt'],['audio','Chỉ nghe']], value:() => R.dir, onChange:v => { R.dir = v; store.set('hsk.dir', R.dir); nextCard(); } });
+  chooser($('#npd'), { label:'Từ mới', options:[10,20,30,50,100].map(n => [n, String(n)]), value:() => R.newPerDay, onChange:v => { R.newPerDay = +v; store.set('hsk.newPerDay', R.newPerDay); renderReview(); } });
   nextCard();
 }
 function nextCard(){
@@ -1038,12 +1121,52 @@ function drawCard(){
   const w = R.cur;
   if (!w){ box.innerHTML = `<div class="card"><div style="font-size:20px;font-weight:600">Hôm nay đã ôn xong ${S.level ? 'HSK ' + S.level : ''}</div><p class="note">Tăng số từ mới mỗi ngày hoặc chọn cấp khác để học tiếp.</p></div>`; return; }
   const front = R.dir === 'vi' ? `<div class="front vi">${esc(w[5])}</div>` : R.dir === 'audio' ? `<button class="btn pri" data-say="${esc(w[2])}">${ICON.play} Nghe lại</button>` : `<div class="front">${esc(w[2])}</div>`;
-  box.innerHTML = `<div class="card" id="card">${front}
+  box.innerHTML = `<div class="card${R.flipped ? ' back' : ''}" id="card" tabindex="0" aria-label="Thẻ học: chạm để lật, vuốt phải nếu nhớ, vuốt trái nếu chưa nhớ"><span class="swl no">Chưa nhớ</span><span class="swl ok">Nhớ rồi</span>${front}
     ${R.flipped ? `<div class="ans">${R.dir !== 'zh' ? `<div class="zh" style="font-size:56px">${esc(w[2])}</div>` : ''}<div class="pyline">${esc(w[3])}</div>${w[4] ? `<div class="hv">Hán Việt: <b>${esc(w[4])}</b></div>` : ''}${R.dir !== 'vi' ? `<div class="mean">${esc(w[5])}</div>` : ''}<div class="zh" style="font-size:17px;margin-top:6px">${hl(w[6], w[2])}</div><div class="note" style="margin:0">${esc(w[8])}</div>
-      <div class="btns" style="justify-content:center;margin-top:6px"><button class="btn" data-say="${esc(w[2])}">${ICON.play} Nghe</button><button class="btn" id="open">Xem chi tiết</button></div></div>` : `<button class="btn pri" id="flip">Lật thẻ</button><span class="note">HSK ${w[1]} · phím cách để lật</span>`}
+      <div class="btns" style="justify-content:center;margin-top:6px"><button class="btn" data-say="${esc(w[2])}">${ICON.play} Nghe</button><button class="btn" id="open">Xem chi tiết</button></div></div>` : `<span class="note fliphint">Chạm vào thẻ để lật · HSK ${w[1]}</span>`}
   </div>
   ${R.flipped ? `<div class="grade"><button class="g0" data-g="0">Chưa nhớ<small>phím 1</small></button><button class="g1" data-g="1">Hơi khó<small>phím 2</small></button><button class="g2" data-g="2">Nhớ rồi<small>phím 3</small></button></div>` : ''}`;
   if (R.dir === 'audio' && !R.flipped) speak(w[2]);
+  const card = $('#card'); if (card && CARD_ENTER){ card.classList.add(CARD_ENTER); CARD_ENTER = ''; }
+  if (card) bindCardSwipe(card);
+}
+let CARD_ENTER = 'enter';
+function flipCard(){
+  const card = $('#card'); if (!card || card.classList.contains('turning')) return;
+  card.classList.add('turning');
+  setTimeout(() => { R.flipped = !R.flipped; CARD_ENTER = 'unturn'; drawCard(); }, 160);
+}
+function flyCard(dir, g){
+  const card = $('#card'); if (!card) { doGrade(g); return; }
+  card.style.transition = 'transform .28s ease-in, opacity .28s ease-in';
+  card.style.transform = `translateX(${dir * (innerWidth + 200)}px) rotate(${dir * 24}deg)`; card.style.opacity = '0';
+  setTimeout(() => { CARD_ENTER = 'enter'; doGrade(g); }, 260);
+}
+// pointer swipe on the flashcard: drag follows the finger, release past the threshold grades it, a tap flips it
+function bindCardSwipe(card){
+  let x0 = 0, y0 = 0, dx = 0, dy = 0, on = false, horiz = null, id = null;
+  const ok = card.querySelector('.swl.ok'), no = card.querySelector('.swl.no');
+  card.addEventListener('pointerdown', e => {
+    if (e.button || e.target.closest('button,a')) return;
+    on = true; horiz = null; x0 = e.clientX; y0 = e.clientY; dx = dy = 0; id = e.pointerId; card.style.transition = 'none';
+  });
+  card.addEventListener('pointermove', e => {
+    if (!on || e.pointerId !== id) return;
+    dx = e.clientX - x0; dy = e.clientY - y0;
+    if (horiz === null && Math.hypot(dx, dy) > 8){ horiz = Math.abs(dx) > Math.abs(dy); if (horiz) try { card.setPointerCapture(id); } catch {} }
+    if (!horiz) return;
+    card.style.transform = `translateX(${dx}px) rotate(${dx / 18}deg)`;
+    const t = Math.min(1, Math.abs(dx) / 110);
+    ok.style.opacity = dx > 0 ? t : 0; no.style.opacity = dx < 0 ? t : 0;
+  });
+  const end = e => {
+    if (!on || (e && e.pointerId !== id)) return; on = false;
+    if (horiz && Math.abs(dx) > 100){ flyCard(dx > 0 ? 1 : -1, dx > 0 ? 2 : 0); return; }
+    card.style.transition = 'transform .25s cubic-bezier(.2,.8,.2,1.2)'; card.style.transform = ''; ok.style.opacity = no.style.opacity = 0;
+    if (!horiz && Math.hypot(dx, dy) < 8 && e && e.type === 'pointerup' && !e.target.closest('button,a')) flipCard();
+  };
+  card.addEventListener('pointerup', end); card.addEventListener('pointercancel', end);
+  card.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); flipCard(); } });
 }
 function doGrade(g){
   const w = R.cur; if (!w) return;
@@ -1054,15 +1177,90 @@ function doGrade(g){
   nextCard();
 }
 $('#review').addEventListener('click', e => {
-  if (e.target.closest('#flip')){ R.flipped = true; drawCard(); return; }
-  const g = e.target.closest('[data-g]'); if (g){ doGrade(+g.dataset.g); return; }
+  const g = e.target.closest('[data-g]'); if (g){ const v = +g.dataset.g; if (v === 1){ CARD_ENTER = 'enter'; doGrade(1); } else flyCard(v === 2 ? 1 : -1, v); return; }
   if (e.target.closest('#open')){ const id = R.cur[0]; setMode('learn'); S.q = ''; $('#q').value=''; applyFilter(); select(id, true); }
 });
 document.addEventListener('keydown', e => {
   if (S.mode !== 'review' || !R.cur || /input|select|textarea/i.test(e.target.tagName)) return;
-  if (e.key === ' ' && !R.flipped){ e.preventDefault(); R.flipped = true; drawCard(); }
-  else if (R.flipped && ['1','2','3'].includes(e.key)) doGrade(+e.key - 1);
+  if (e.key === ' '){ e.preventDefault(); flipCard(); }
+  else if (e.key === 'ArrowRight') flyCard(1, 2);
+  else if (e.key === 'ArrowLeft') flyCard(-1, 0);
+  else if (R.flipped && ['1','2','3'].includes(e.key)){ const v = +e.key - 1; if (v === 1){ CARD_ENTER = 'enter'; doGrade(1); } else flyCard(v === 2 ? 1 : -1, v); }
 });
+
+
+// ---------- chooser: segmented buttons; when they don't fit the width they fold into one button that opens a popup ----------
+let POP = null;
+function closePop(){ if (POP){ POP.remove(); POP = null; document.querySelectorAll('.cho-btn[aria-expanded="true"]').forEach(b => b.setAttribute('aria-expanded', 'false')); } }
+function chooser(el, cfg){
+  el._cfg = cfg;
+  const cur = () => String(cfg.value());
+  const curLabel = () => (cfg.options.find(o => String(o[0]) === cur()) || cfg.options[0])[1];
+  el.innerHTML = `<div class="seg">${cfg.options.map(([v, l]) => `<button type="button" data-v="${esc(String(v))}" aria-pressed="${String(v) === cur()}">${esc(String(l))}</button>`).join('')}</div>
+    <button type="button" class="cho-btn" aria-haspopup="listbox" aria-expanded="false"><span class="cl">${esc(cfg.label)}</span><b>${esc(String(curLabel()))}</b><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></button>`;
+  const pick = v => { closePop(); const o = cfg.options.find(o => String(o[0]) === v); cfg.onChange(typeof o[0] === 'number' ? +v : v); if (el.isConnected) chooser(el, cfg); };
+  el.querySelector('.seg').onclick = e => { const b = e.target.closest('[data-v]'); if (b) pick(b.dataset.v); };
+  el.querySelector('.cho-btn').onclick = e => {
+    e.stopPropagation(); if (POP && POP._owner === el){ closePop(); return; } closePop();
+    const btn = e.currentTarget; btn.setAttribute('aria-expanded', 'true');
+    const phone = matchMedia('(max-width:760px)').matches;
+    POP = document.createElement('div'); POP._owner = el; POP.className = 'pop' + (phone ? ' sheetpop' : '');
+    POP.innerHTML = `${phone ? `<div class="pop-h">${esc(cfg.label)}</div>` : ''}<div class="pop-list" role="listbox">${cfg.options.map(([v, l]) => `<button type="button" role="option" data-v="${esc(String(v))}" aria-selected="${String(v) === cur()}">${esc(String(l))}<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg></button>`).join('')}</div>`;
+    if (phone){ const bd = document.createElement('div'); bd.className = 'pop-bd'; POP.prepend(bd); bd.onclick = closePop; }
+    document.body.appendChild(POP);
+    if (!phone){ const r = btn.getBoundingClientRect(); const list = POP.querySelector('.pop-list'); const w = Math.max(r.width, 200); let left = Math.min(r.left, innerWidth - w - 12); list.style.cssText = `position:fixed;top:${r.bottom + 6}px;left:${Math.max(12, left)}px;min-width:${w}px`; }
+    POP.querySelector('.pop-list').onclick = ev => { const b = ev.target.closest('[data-v]'); if (b) pick(b.dataset.v); };
+    const sel = POP.querySelector('[aria-selected="true"]'); sel && sel.focus({preventScroll:true});
+  };
+  fitChooser(el);
+}
+function fitChooser(el){
+  if (!el.isConnected || el.hidden) return;
+  el.classList.remove('folded');
+  const seg = el.querySelector('.seg'); if (!seg) return;
+  const avail = el.parentElement ? el.clientWidth : 0;
+  if (seg.scrollWidth > avail + 1) el.classList.add('folded');
+}
+const fitAll = () => document.querySelectorAll('.cho').forEach(fitChooser);
+let fitT; addEventListener('resize', () => { closePop(); clearTimeout(fitT); fitT = setTimeout(fitAll, 120); });
+document.addEventListener('click', e => { if (POP && !e.target.closest('.pop')) closePop(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePop(); });
+
+// ---------- swipe to go back from a detail sheet on phones (either direction; the sheet follows the finger) ----------
+function bindSwipeBack(deskSel){
+  const desk = $(deskSel); const sheet = desk.querySelector('.sheet');
+  let x0 = 0, y0 = 0, dx = 0, on = false, horiz = null, id = null;
+  sheet.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' || !matchMedia('(max-width:760px)').matches || !desk.classList.contains('detail')) return;
+    if (e.target.closest('.pad,input,textarea,select,.ctabs,.pron')) return;
+    on = true; horiz = null; dx = 0; x0 = e.clientX; y0 = e.clientY; id = e.pointerId; sheet.style.transition = 'none';
+  });
+  sheet.addEventListener('pointermove', e => {
+    if (!on || e.pointerId !== id) return;
+    dx = e.clientX - x0; const dy = e.clientY - y0;
+    if (horiz === null && Math.hypot(dx, dy) > 10){ horiz = Math.abs(dx) > Math.abs(dy) * 1.4; if (horiz) try { sheet.setPointerCapture(id); } catch {} }
+    if (horiz){ sheet.style.transform = `translateX(${dx}px)`; sheet.style.opacity = String(1 - Math.min(.5, Math.abs(dx) / 600)); }
+  });
+  const end = e => {
+    if (!on || e.pointerId !== id) return; on = false;
+    if (horiz && Math.abs(dx) > 90){
+      sheet.style.transition = 'transform .22s ease-in, opacity .22s ease-in'; sheet.style.transform = `translateX(${Math.sign(dx) * innerWidth}px)`; sheet.style.opacity = '0';
+      setTimeout(() => { desk.classList.remove('detail'); sheet.style.transition = sheet.style.transform = sheet.style.opacity = ''; window.scrollTo({top:0}); }, 200);
+    } else { sheet.style.transition = 'transform .2s ease-out, opacity .2s'; sheet.style.transform = ''; sheet.style.opacity = ''; }
+  };
+  sheet.addEventListener('pointerup', end); sheet.addEventListener('pointercancel', end);
+}
+bindSwipeBack('#learn'); bindSwipeBack('#sec');
+
+// ---------- top menu: sliding ink pill under the active section ----------
+function placeModeInd(){
+  const nav = document.querySelector('.modes'); if (!nav) return;
+  let ind = nav.querySelector('.mode-ind'); if (!ind){ ind = document.createElement('span'); ind.className = 'mode-ind'; ind.setAttribute('aria-hidden', 'true'); nav.prepend(ind); }
+  const a = nav.querySelector('[aria-pressed="true"]'); if (!a) return;
+  ind.style.width = a.offsetWidth + 'px'; ind.style.height = a.offsetHeight + 'px'; ind.style.transform = `translate(${a.offsetLeft}px, ${a.offsetTop}px)`;
+  nav.classList.add('ready');
+}
+addEventListener('resize', placeModeInd);
 
 // ---------- boot ----------
 async function boot(){
